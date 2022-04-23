@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<!--xmlns:th="http://www.thymeleaf.org"-->
-
 <head>
     <meta charset="UTF-8">
     <title>TestModule</title>
@@ -23,10 +21,14 @@
             type: "POST",
             url: "/sendPayment",
             contentType: "application/xml",
-            data: $("#xmlText").val()
+            data: $("#xmlText").val(),
+            error: function (jqXHR) {
+                if (jqXHR.status == 400) alert(jqXHR.responseText);
+            }
         })
             .then(function (data) {
                 $("#xmlText").val(JSON.stringify(data, undefined, 4));
+                alert('parsed successful')
             });
     });
 

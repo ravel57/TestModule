@@ -1,4 +1,4 @@
-package ru.ravel.TestModule.dto;
+package ru.ravel.TestModule.jaxb;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -6,8 +6,11 @@ import javax.xml.bind.annotation.XmlAttribute;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Field {
-    @XmlAttribute
+
+    @XmlAttribute (name = "id")
     public long id;
-    @XmlAttribute
+
+    @XmlAttribute (name = "value")
     public String value;
+
 }

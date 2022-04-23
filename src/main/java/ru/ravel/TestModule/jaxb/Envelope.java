@@ -1,4 +1,4 @@
-package ru.ravel.TestModule.dto;
+package ru.ravel.TestModule.jaxb;
 
 import javax.xml.bind.annotation.*;
 
