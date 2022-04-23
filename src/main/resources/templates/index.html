@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!--xmlns:th="http://www.thymeleaf.org"-->
+
+<head>
+    <meta charset="UTF-8">
+    <title>TestModule</title>
+    <script src="https://code.jquery.com/jquery-3.5.0.js"></script>
+</head>
+
+<body>
+<div>
+    <textarea name="xml" id="xmlText" class="text" cols="100" rows="20"></textarea><br>
+    <button id="sendButton">Submit</button>
+</div>
+</body>
+
+<script lang="text/javascript">
+
+    $("#sendButton").click(function () {
+        $.ajax({
+            type: "POST",
+            url: "/sendPayment",
+            contentType: "application/xml",
+            data: $("#xmlText").val()
+        })
+            .then(function (data) {
+                $("#xmlText").val(JSON.stringify(data, undefined, 4));
+            });
+    });
+
+</script>
+
+</html>
