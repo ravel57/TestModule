@@ -1,6 +1,7 @@
 package ru.ravel.TestModule.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -11,43 +12,59 @@ import org.springframework.web.bind.annotation.*;
 import ru.ravel.TestModule.jaxb.Envelope;
 import ru.ravel.TestModule.services.ConverterService;
 
+import javax.servlet.http.HttpSession;
 import javax.xml.bind.UnmarshalException;
+import java.util.HashMap;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/")
+@Log4j
 public class MainController {
 
     @Autowired
     ConverterService converterService;
+
+    Map<String, String> sessionResults = new HashMap<>();
+
 
     @GetMapping
     public String rootGetMapping() {
         return "index";
     }
 
-    @PostMapping(
-            value = "/sendPayment",
+
+    @PostMapping(value = "/sendPayment",
             consumes = {MediaType.APPLICATION_XML_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<Object> rootPostMapping(@RequestBody Envelope envelope) {
+    public ResponseEntity<Object> rootPostMapping(@RequestBody Envelope envelope,
+                                                  HttpSession httpSession) {
         try {
-            return ResponseEntity
-                    .status(HttpStatus.OK)
-                    .body(converterService.convertEnvelopeToString(envelope));
+            String paresJson = converterService.convertEnvelopeToString(envelope);
+            log.info(paresJson);
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(paresJson);
         } catch (JsonProcessingException e) {
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body(null);
+            log.error(e.getMessage());
+            sessionResults.put(httpSession.getId(), e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
+    }
+
+    @GetMapping("/errorpage")
+    public String errorPageGetMapping(HttpSession httpSession) {
+        httpSession.setAttribute("errorMessage", sessionResults.get(httpSession.getId()));
+        return "errorpage";
     }
 
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<Object> ExceptionHandlerMapping(HttpMessageNotReadableException e) {
+    public ResponseEntity<Object> ExceptionHandlerMapping(HttpMessageNotReadableException e,
+                                                          HttpSession httpSession) {
         if (e.getCause() instanceof UnmarshalException) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("unmarshal exception");
+            sessionResults.put(httpSession.getId(), e.getMessage());
         }
+        log.error(e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
     }
-
 }

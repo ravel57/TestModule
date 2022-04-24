@@ -22,8 +22,10 @@
             url: "/sendPayment",
             contentType: "application/xml",
             data: $("#xmlText").val(),
-            error: function (jqXHR) {
-                if (jqXHR.status == 400) alert(jqXHR.responseText);
+            error: function (response) {
+                if (response.status == 400){
+                    window.location.href ='/errorpage';
+                }
             }
         })
             .then(function (data) {
